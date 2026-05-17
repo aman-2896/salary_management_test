@@ -76,3 +76,52 @@ across name/email/job_title, and filters for country/department/job_title."
 makes unit testing possible without spinning up the HTTP server. Routes are
 just thin wrappers that call services and handle HTTP concerns (status codes,
 404s). Business logic lives only in the service layer.
+
+## Prompt 6 — Analytics service endpoints
+
+**Tool**: Claude
+**Prompt**: "Write a SQLAlchemy analytics service for a salary management system
+with 10,000 employees. Required metrics: min/max/avg salary by country, average
+salary by job_title within a specific country. Extra metrics meaningful to an
+HR Manager: headcount and avg/min/max salary per department, top N highest paid
+job titles globally by average salary, salary histogram distribution split into
+8 bands, salary percentile bands (P25, P50, P75, P90), headcount and avg salary
+per country. Use SQLAlchemy func for all aggregations, no raw SQL. Also write
+the FastAPI router that exposes each metric as a GET endpoint."
+**Used for**: `app/services/analytics_service.py`, `app/api/routes/analytics.py`
+**Decision made**: Extra metrics were chosen specifically for the HR Manager
+persona — department breakdown helps spot underpaid teams, percentile bands
+surface pay equity issues, top paid roles helps benchmark compensation strategy.
+These are not random additions; each one answers a question an HR Manager would
+actually ask when opening this dashboard.
+
+## Prompt 7 — Unit tests with fixture data
+
+**Tool**: Claude
+**Prompt**: "Write pytest unit tests for a FastAPI salary management service.
+Use an in-memory SQLite test database so tests never touch the real DB.
+Write a conftest.py with a db fixture (fresh per test) and a sample_employees
+fixture with known deterministic values. Test CRUD operations, pagination,
+search, and all analytics functions. Test names should read like sentences
+describing what they verify."
+**Used for**: `tests/conftest.py`, `tests/test_employee_service.py`,
+`tests/test_analytics_service.py`
+**Decision made**: In-memory SQLite with drop_all after each test guarantees
+zero state leakage between tests. Using known fixture values (e.g. exact
+salaries of 90k, 120k, 140k) means we can assert exact averages — no
+approximations needed.
+
+## Prompt 8 — Frontend scaffold and API layer
+
+**Tool**: Claude
+**Prompt**: "Set up a React 18 + Vite + TypeScript frontend for a salary
+management tool. Install TanStack Query for server state, Axios for HTTP,
+React Router for navigation, Recharts for charts, Tailwind CSS for styling,
+Radix UI for accessible primitives. Create typed API modules for employees
+(CRUD + meta endpoints) and analytics. Build an app shell with a fixed
+sidebar navigation using a dark navy theme."
+**Used for**: `frontend/` scaffold, `src/api/`, `src/App.tsx`
+**Decision made**: All API calls centralised in `src/api/` — one file per
+domain (employees, analytics). This means if the base URL or any endpoint
+changes, there is exactly one place to update it. Components never call
+axios directly.
