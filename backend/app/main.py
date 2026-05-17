@@ -4,6 +4,10 @@ from app.core.database import engine
 from app.models import employee
 from app.core.database import Base
 from app.api.routes import employees
+from app.api.routes import employees, analytics
+
+
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -20,6 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(employees.router, prefix="/api/v1")
+app.include_router(analytics.router, prefix="/api/v1")
 @app.get("/health")
 def health_check():
     return {"status":"ok"}
