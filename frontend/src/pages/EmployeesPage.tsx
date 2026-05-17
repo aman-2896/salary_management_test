@@ -10,6 +10,12 @@ import EmployeeFormModal from "../components/EmployeeFormModal";
 import DeleteConfirmModal from "../components/DeleteConfirmModal";
 
 const PAGE_SIZE = 20;
+import { Download } from "lucide-react";  
+
+// Add this import at the top
+
+// Add this button next to the Add Employee button
+
 
 export default function EmployeesPage() {
   const [page, setPage]           = useState(1);
@@ -66,6 +72,14 @@ export default function EmployeesPage() {
         >
           <Plus size={16} />
           Add Employee
+              </button>
+              
+        <button
+        onClick={handleExport}
+        className="flex items-center gap-2 px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-600 text-sm font-medium rounded-lg transition-colors"
+        >
+        <Download size={16} />
+        Export CSV
         </button>
       </div>
 
@@ -232,5 +246,37 @@ export default function EmployeesPage() {
         <DeleteConfirmModal employee={deleteTarget} onClose={() => setDeleteTarget(null)} />
       )}
     </div>
-  );
+    );
+    
+    // Add this function inside EmployeesPage component
+async function handleExport() {
+  const all = await getEmployees({
+    page: 1, page_size: 10000,
+    search, country, department
+  });
+
+  const headers = [
+    "ID", "Full Name", "Email", "Job Title",
+    "Department", "Country", "Salary", "Currency",
+    "Employment Type", "Hire Date"
+  ];
+
+  const rows = all.data.map(e => [
+    e.id, e.full_name, e.email, e.job_title,
+    e.department, e.country, e.salary, e.currency,
+    e.employment_type, e.hire_date,
+  ]);
+
+  const csv = [headers, ...rows]
+    .map(row => row.map(String).join(","))
+    .join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = `employees-export-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 }
