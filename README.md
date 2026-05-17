@@ -35,6 +35,7 @@ built for an HR Manager persona.
 
 ## Project Structure
 
+```
 salary-management/
 ├── backend/
 │   ├── app/
@@ -53,14 +54,16 @@ salary-management/
 │       ├── pages/           # EmployeesPage, InsightsPage
 │       └── lib/             # Utility helpers
 └── docs/
-├── ARCHITECTURE.md
-├── TRADEOFFS.md
-├── PROMPTS.md
-└── PERFORMANCE.md
+    ├── ARCHITECTURE.md
+    ├── TRADEOFFS.md
+    ├── PROMPTS.md
+    └── PERFORMANCE.md
+```
 
 ## Local Setup
 
 ### Backend
+
 ```
 cd backend
 python -m venv .venv
