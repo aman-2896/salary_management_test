@@ -142,3 +142,20 @@ placeholderData so the table doesn't flash on page change."
 **Decision made**: placeholderData keeps the previous page visible while the
 next page loads — avoids a jarring blank flash on pagination which would feel
 broken to an HR manager flipping through 500 pages of employees.
+
+
+## Prompt 10 — Insights dashboard
+
+**Tool**: Claude
+**Prompt**: "Build a React insights dashboard for an HR salary management tool
+using Recharts. Required: min/max/avg salary stat cards per country, avg salary
+by job title per country. Extras that add HR value: salary percentile band
+visualisation (P25/P50/P75/P90), salary distribution histogram, department avg
+salary horizontal bar chart, top 10 highest paid roles globally, headcount per
+country bar chart. Country selector drives the country-level charts. Use
+TanStack Query for all data fetching."
+**Used for**: `src/pages/InsightsPage.tsx`
+**Decision made**: Country selector is a single control that drives four charts
+simultaneously — distribution, percentiles, job title breakdown, and stat cards.
+This is intentional UX: an HR manager analysing a specific country gets a
+complete picture in one view without re-selecting country four times.
