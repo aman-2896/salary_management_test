@@ -24,5 +24,39 @@ country, salary, currency, employment_type, hire_date, created_at, updated_at.
 Add database indexes optimised for analytics queries that GROUP BY country and
 job_title. Use DeclarativeBase (SQLAlchemy 2.x style)."
 **Used for**: `app/models/employee.py` — final model structure and index strategy
-**Decision made**: Added composite index on (country, job_title) together, not just
-individually — because the analytics query filters on both simultaneously.
+**Decision made**: Added a composite index on (country, job_title) together, not
+just individually — because the primary analytics query filters on both
+simultaneously. Single-column indexes would still require a full scan for that
+combined filter.
+
+---
+
+## Prompt 3 — Name files for seed script
+
+**Tool**: Claude
+**Prompt**: "Give me two plain text files for a seed script — first_names.txt
+and last_names.txt. Each file should have one name per line. Include ~80 diverse
+first names and ~80 diverse last names representing a global workforce across
+different ethnicities and cultures, since our employee data spans 15 countries."
+**Used for**: `backend/seed/first_names.txt` and `backend/seed/last_names.txt`
+**Decision made**: Chose culturally diverse names intentionally — the seeded data
+spans 15 countries, so names from only one culture would feel unrealistic and
+would not reflect a global org. Realistic data makes the insights dashboard
+more meaningful during the demo.
+
+---
+
+## Prompt 4 — Seed script with bulk inserts
+
+**Tool**: Claude
+**Prompt**: "Write a Python seed script for SQLite using SQLAlchemy that inserts
+10,000 employee records. Use bulk_insert_mappings inside a single transaction
+with a batch size of 500. The script should be idempotent (clear before
+re-seeding), accept a --count argument, load names from first_names.txt and
+last_names.txt, and print time taken on completion."
+**Used for**: `backend/seed/seed.py`
+**Decision made**: Batch size of 500 chosen deliberately — stays safely under
+SQLite's 999 bound variables limit per statement, while keeping the number of
+transactions minimal. bulk_insert_mappings was chosen over session.add() because
+it bypasses ORM object instantiation entirely, which is the main bottleneck at
+this scale.
