@@ -60,3 +60,19 @@ SQLite's 999 bound variables limit per statement, while keeping the number of
 transactions minimal. bulk_insert_mappings was chosen over session.add() because
 it bypasses ORM object instantiation entirely, which is the main bottleneck at
 this scale.
+
+## Prompt 5 — Pydantic schemas and service layer
+
+**Tool**: Claude
+**Prompt**: "Write Pydantic v2 schemas for an Employee CRUD API. Include
+EmployeeCreate (all required fields + validators), EmployeeUpdate (all optional
+for partial updates), EmployeeResponse (adds id, created_at, updated_at, with
+from_attributes=True). Validators: salary positive, full_name not whitespace,
+employment_type from allowed set. Also write a service layer separating DB
+logic from route handlers, with get_employees supporting pagination, search
+across name/email/job_title, and filters for country/department/job_title."
+**Used for**: `app/schemas/employee.py`, `app/services/employee_service.py`
+**Decision made**: Service layer kept separate from routes deliberately — this
+makes unit testing possible without spinning up the HTTP server. Routes are
+just thin wrappers that call services and handle HTTP concerns (status codes,
+404s). Business logic lives only in the service layer.
